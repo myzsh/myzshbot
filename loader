@@ -1,0 +1,16 @@
+#!/usr/bin/zsh
+
+zmodload -i zsh/net/tcp
+
+while true; do 
+	irc.zsh
+done &
+
+while true; do
+	http.zsh
+	err=$?
+	ztcp localhost 7000
+	echo "msg #myzsh http.zsh crashed Err: $err" >&$REPLY
+	ztcp -c $REPLY
+done
+wait

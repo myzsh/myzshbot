@@ -1,5 +1,5 @@
 #!/usr/bin/zsh
-set -euo pipefail
+set -eu
 
 source json.zsh
 
@@ -38,9 +38,11 @@ http_router(){
 		mkdir hooks 2>/dev/null || true
 		echo "$body" > hooks/${headers[X-GitHub-Delivery]}.json
 
-		ztcp localhost 7000
-		echo "msg #myzsh Event of type ${headers[X-GitHub-Event]}: ${headers[X-GitHub-Delivery]}" >&$REPLY
-		ztcp -c $REPLY
+		(
+			ztcp localhost 7000
+			echo "msg #myzsh Event of type ${headers[X-GitHub-Event]}: ${headers[X-GitHub-Delivery]}" >&$REPLY
+			ztcp -c $REPLY
+		) &
 	fi
 
 	echo "HTTP/1.1 200 OK" >&$client
@@ -53,7 +55,7 @@ http_parser(){
 	client=$1
 	typeset -A headers
 	body=""
-	read -r method url http <&$client
+	read -r method url http <&$client || ( ztcp -c $client && return )
 	headers[METHOD]=method
 	headers[HTTP]=http
 	url="${url//\/\///}"
