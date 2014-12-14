@@ -1,5 +1,5 @@
 #!/usr/bin/zsh
-set -euo pipefail
+set -eu
 
 module_reload(){
 	for m in modules/*.zsh; do
