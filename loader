@@ -4,6 +4,8 @@ zmodload -i zsh/net/tcp
 
 cd /myzshbot
 
+git pull -f
+
 while true; do 
 	./irc.zsh
 	sleep 1
