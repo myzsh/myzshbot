@@ -50,12 +50,18 @@ http_router(){
 			whom="$(JSON.get -s /pusher/name jason)"
 			commits="commit"
 			number=$(echo "$jason" | grep -cE "^/commits/[0-9]*/id")
-			[[ "$number" -gt 1 ]] && commits="commits"
 			branch="$(basename "$(JSON.get -s /ref jason)")"
 			repo="$(JSON.get -s /repository/name jason)"
 			force="$(JSON.get /forced jason)"
 			[[ "$force" == "false" ]] && force="" || force="forced "
-			rpc "msg #myzsh $whom ${force}pushed $number $commits to $repo @$branch"
+			url="$(JSON.get -s /compare jason)"
+			msg=""
+			if [[ "$number" -gt 1 ]]; then
+				commits="commits"
+			else
+				msg="\"$(JSON.get -s /commits/0/message jason)\" "
+			fi
+			rpc "msg #myzsh $whom ${force}pushed $number $commits to $repo @$branch ${msg}$url"
 			if [[ "$repo" == "myzshbot" ]] && [[ "$branch" == "master" ]]; then
 				rpc "msg #myzsh reloading modules"
 				http_reload &
