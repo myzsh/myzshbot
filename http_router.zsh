@@ -28,7 +28,7 @@ http_router(){
 	[[ "$url" == "/quit" ]] && ztcp -c && exit 2
 
 	if [[ "$url" == "/pull" ]]; then
-		http_reload &
+		http_reload
 	elif [[ "$url" == "/github" ]]; then
 		if [ -z "$body" ]; then
 			echo "No body!"
@@ -64,7 +64,7 @@ http_router(){
 			rpc "msg #myzsh $whom ${force}pushed $number $commits to $repo @$branch ${msg}$url"
 			if [[ "$repo" == "myzshbot" ]] && [[ "$branch" == "master" ]]; then
 				rpc "msg #myzsh reloading modules"
-				http_reload &
+				http_reload
 			fi
 		else
 			rpc "msg #myzsh Event of type $event: ${headers[X-GitHub-Delivery]}"
