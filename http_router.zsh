@@ -1,3 +1,10 @@
+rpc(){
+	ztcp localhost 7000
+	# TODO read the banner to make sure we connected ok
+	echo "$2" >&$1
+	# TODO read a response and print
+	ztcp -c $1
+}
 http_router(){
 	client=$1
 	url=$2
@@ -31,18 +38,28 @@ http_router(){
 			echo "No X-GitHub-Event header!"
 			return
 		fi
+		event="${headers[X-GitHub-Event]}"
 
 		echo "parsing body"
-		echo "Event type: ${headers[X-GitHub-Event]}"
+		echo "Event type: $event"
 		JSON.load "$body" jason
 		mkdir hooks 2>/dev/null || true
 		echo "$body" > hooks/${headers[X-GitHub-Delivery]}.json
 
-		(
-			ztcp localhost 7000
-			echo "msg #myzsh Event of type ${headers[X-GitHub-Event]}: ${headers[X-GitHub-Delivery]}" >&$REPLY
-			ztcp -c $REPLY
-		) &
+		if [[ "$event" == "push" ]]; then
+			whom="$(JSON.get -s /pusher/name jason)"
+			commits="commit"
+			number=$(echo "$jason" | grep -cE "^/commits/[0-9]*/id")
+			[[ "$number" -gt 1 ]] && commits="commits"
+			branch="$(basename "$(JSON.get -s /ref jason)")"
+			repo="$(JSON.get -s /repository/name jason)"
+			force="$(JSON.get /forced jason)"
+			[[ "$force" == "false" ]] && force="" || force="forced "
+			rpc $client "msg #myzsh $whom ${force}pushed $number $commits to $repo @$branch"
+		else
+			rpc $client "msg #myzsh Event of type $event: ${headers[X-GitHub-Delivery]}"
+		fi
+
 	fi
 
 	echo "HTTP/1.1 200 OK" >&$client
