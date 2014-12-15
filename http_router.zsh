@@ -5,6 +5,15 @@ rpc(){
 	# TODO read a response and print
 	ztcp -c $REPLY
 }
+
+http_reload(){
+	until git pull -f; do
+		sleep 1
+	done
+	source http_router.zsh
+	rpc "source"
+}
+
 http_router(){
 	client=$1
 	url=$2
@@ -19,13 +28,7 @@ http_router(){
 	[[ "$url" == "/quit" ]] && ztcp -c && exit 2
 
 	if [[ "$url" == "/pull" ]]; then
-		(
-			until git pull -f; do
-				sleep 1
-			done
-			source http_router.zsh
-			rpc "source"
-		) &
+		http_reload &
 	elif [[ "$url" == "/github" ]]; then
 		if [ -z "$body" ]; then
 			echo "No body!"
@@ -53,6 +56,10 @@ http_router(){
 			force="$(JSON.get /forced jason)"
 			[[ "$force" == "false" ]] && force="" || force="forced "
 			rpc "msg #myzsh $whom ${force}pushed $number $commits to $repo @$branch"
+			if [[ "$repo" == "myzshbot" ]] && [[ "$branch" == "master" ]]; then
+				rpc "msg #myzsh reloading modules"
+				http_reload &
+			fi
 		else
 			rpc "msg #myzsh Event of type $event: ${headers[X-GitHub-Delivery]}"
 		fi
