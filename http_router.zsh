@@ -11,7 +11,16 @@ http_router(){
 	done
 	[[ "$url" == "/quit" ]] && ztcp -c && exit 2
 
-	[[ "$url" == "/source" ]] && source http_router.zsh && return
+	if [[ "$url" == "/pull" ]]; then
+		git pull -f
+		source http_router.zsh
+		(
+			ztcp localhost 7000
+			echo "source" >&$REPLY
+			ztcp -c $REPLY
+		) &
+		return
+	fi
 
 	if [[ "$url" == "/github" ]]; then
 		if [ -z "$body" ]; then

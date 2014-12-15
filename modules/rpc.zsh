@@ -5,5 +5,7 @@ do_rpc() {
 		msg "${match[1]}" "${match[2]}"
 	elif [[ "$clientin" =~ "^ztcp" ]]; then
 		ztcp -L >&$client
+	elif [[ "$clientin" =~ "^source" ]]; then
+		module_reload
 	fi
 }
