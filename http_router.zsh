@@ -1,9 +1,9 @@
 rpc(){
 	ztcp localhost 7000
 	# TODO read the banner to make sure we connected ok
-	echo "$2" >&$1
+	echo "$1" >&$REPLY
 	# TODO read a response and print
-	ztcp -c $1
+	ztcp -c $REPLY
 }
 http_router(){
 	client=$1
@@ -19,17 +19,14 @@ http_router(){
 	[[ "$url" == "/quit" ]] && ztcp -c && exit 2
 
 	if [[ "$url" == "/pull" ]]; then
-		git pull -f
-		source http_router.zsh
 		(
-			ztcp localhost 7000
-			echo "source" >&$REPLY
-			ztcp -c $REPLY
+			until git pull -f; do
+				sleep 1
+			done
+			source http_router.zsh
+			rpc "source"
 		) &
-		return
-	fi
-
-	if [[ "$url" == "/github" ]]; then
+	elif [[ "$url" == "/github" ]]; then
 		if [ -z "$body" ]; then
 			echo "No body!"
 			return
@@ -55,9 +52,9 @@ http_router(){
 			repo="$(JSON.get -s /repository/name jason)"
 			force="$(JSON.get /forced jason)"
 			[[ "$force" == "false" ]] && force="" || force="forced "
-			rpc $client "msg #myzsh $whom ${force}pushed $number $commits to $repo @$branch"
+			rpc "msg #myzsh $whom ${force}pushed $number $commits to $repo @$branch"
 		else
-			rpc $client "msg #myzsh Event of type $event: ${headers[X-GitHub-Delivery]}"
+			rpc "msg #myzsh Event of type $event: ${headers[X-GitHub-Delivery]}"
 		fi
 
 	fi
