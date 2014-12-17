@@ -67,7 +67,7 @@ http_router(){
 				http_reload
 			fi
 		elif [[ "$event" == "pull_request" ]]; then
-			who="$(JSON.get -s /pull_request/user/id jason)"
+			who="$(JSON.get -s /pull_request/user/login jason)"
 			title="$(JSON.get /pull_request/title jason)"
 			url="$(JSON.get -s /pull_request/url jason)"
 			rpc "msg #msg $who opened pull request $title $url"
