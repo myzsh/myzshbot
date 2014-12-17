@@ -66,6 +66,11 @@ http_router(){
 				rpc "msg #myzsh reloading modules"
 				http_reload
 			fi
+		elif [[ "$event" == "pull_request" ]]; then
+			who="$(JSON.get -s /pull_request/user/id jason)"
+			title="$(JSON.get /pull_request/title jason)"
+			url="$(JSON.get -s /pull_request/url jason)"
+			rpc "msg #msg $who opened pull request $title $url"
 		else
 			rpc "msg #myzsh Event of type $event: ${headers[X-GitHub-Delivery]}"
 		fi
