@@ -76,6 +76,11 @@ http_router(){
 			title="$(JSON.get /issue/title jason)"
 			url="$(JSON.get -s /issue/html_url jason)"
 			rpc "msg #myzsh $who opened pull request $title $url"
+		elif [[ "$event" == "pull_request_review_comment" ]]; then
+			who="$(JSON.get -s /comment/user/login jason)"
+			title="$(JSON.get /pull_request/title jason)"
+			url="$(JSON.get -s /comment/url jason)"
+			rpc "msg #myzsh $who opened pull request $title $url"
 		else
 			rpc "msg #myzsh Event of type $event: ${headers[X-GitHub-Delivery]}"
 		fi
