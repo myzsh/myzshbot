@@ -70,7 +70,12 @@ http_router(){
 			who="$(JSON.get -s /pull_request/user/login jason)"
 			title="$(JSON.get /pull_request/title jason)"
 			url="$(JSON.get -s /pull_request/html_url jason)"
-			rpc "msg #myzsh $who opened pull request $title $url"
+			if [[ "$(JSON.get -s /action)" == "opened" ]]; then
+				rpc "msg #myzsh $who opened pull request $title $url"
+			elif [[ "$(JSON.get -s /action)" == "labeled" ]]; then
+				label="$(JSON.get /label/name jason)"
+				rpc "msg #myzsh $who labeled pull request $title as $label $url"
+			fi
 		elif [[ "$event" == "issue_comment" ]]; then
 			who="$(JSON.get -s /issue/user/login jason)"
 			title="$(JSON.get /issue/title jason)"
