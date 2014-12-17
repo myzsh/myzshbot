@@ -70,7 +70,7 @@ http_router(){
 			who="$(JSON.get -s /pull_request/user/login jason)"
 			title="$(JSON.get /pull_request/title jason)"
 			url="$(JSON.get -s /pull_request/url jason)"
-			rpc "msg #msg $who opened pull request $title $url"
+			rpc "msg #myzsh $who opened pull request $title $url"
 		else
 			rpc "msg #myzsh Event of type $event: ${headers[X-GitHub-Delivery]}"
 		fi
