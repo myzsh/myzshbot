@@ -46,6 +46,10 @@ http_router(){
 		mkdir hooks 2>/dev/null || true
 		echo "$body" > hooks/${headers[X-GitHub-Delivery]}.json
 
+# [{purple}myzsh-docker{reset}] dan9186 created {purple}change-dev-mapped-dir{reset} (+1 new commit): {blue}https://github.com/myzsh/myzsh-docker/commit/b0614575bde3
+# {purple}myzsh-docker{reset}/{purple}change-dev-mapped-dir{reset} b061457 Daniel Hess: changing to /docker per issue #4
+# [{purple}myzsh-docker{reset}] dan9186 opened pull request #9: changing to /docker per issue #4 ({purple}master{reset}...{purple}change-dev-mapped-dir{reset}) {blue}https://github.com/myzsh/myzsh-docker/pull/9
+
 		if [[ "$event" == "push" ]]; then
 			whom="$(JSON.get -s /pusher/name jason)"
 			commits="commit"
@@ -61,10 +65,17 @@ http_router(){
 			else
 				msg="\"$(JSON.get -s /commits/0/message jason)\" "
 			fi
-			rpc "msg #myzsh $whom ${force}pushed $number $commits to $repo @$branch ${msg}$url"
+			rpc "msg #myzsh [{purple}$repo{reset}/{purple}$branch{reset}] $whom ${force}pushed $number $commits ${msg}{blue}$url"
 			if [[ "$repo" == "myzshbot" ]] && [[ "$branch" == "master" ]]; then
 				rpc "msg #myzsh reloading modules"
+				echo "HTTP/1.1 200 OK" >&$client
+				echo "Content-type: text/plain" >&$client
+				echo "Connection: close" >&$client
+				echo "" >&$client
+				echo "Reloading modules"
+				ztcp -c $client
 				http_reload
+				return
 			fi
 		elif [[ "$event" == "pull_request" ]]; then
 			who="$(JSON.get -s /pull_request/user/login jason)"
