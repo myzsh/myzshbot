@@ -15,8 +15,9 @@ zmodload -i zsh/stat
 ztcp chat.freenode.net 6667
 ircfd=$REPLY
 
+NICK="${NICK:-myzshbot}"
 
-print 'NICK myzshbot' >&$ircfd
+print "NICK $NICK" >&$ircfd
 print 'USER myzshbot "" "" :myzshbot' >&$ircfd
 
 ztcp -vl 7000
