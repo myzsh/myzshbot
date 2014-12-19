@@ -82,21 +82,21 @@ http_router(){
 			title="$(JSON.get /pull_request/title jason)"
 			url="$(JSON.get -s /pull_request/html_url jason)"
 			if [[ "$(JSON.get -s /action)" == "opened" ]]; then
-				rpc "msg #myzsh $who opened pull request $title $url"
+				rpc "msg #myzsh [{purple}$repo{reset}] $who opened pull request $title {blue}$url"
 			elif [[ "$(JSON.get -s /action)" == "labeled" ]]; then
 				label="$(JSON.get /label/name jason)"
-				rpc "msg #myzsh $who labeled pull request $title as $label $url"
+				rpc "msg #myzsh [{purple}$repo{reset}] $who labeled pull request $title as $label {blue}$url"
 			fi
 		elif [[ "$event" == "issue_comment" ]]; then
 			who="$(JSON.get -s /issue/user/login jason)"
 			title="$(JSON.get /issue/title jason)"
 			url="$(JSON.get -s /issue/html_url jason)"
-			rpc "msg #myzsh $who commented on issue $title $url"
+			rpc "msg #myzsh [{purple}$repo{reset}] $who commented on issue $title {blue}$url"
 		elif [[ "$event" == "pull_request_review_comment" ]]; then
 			who="$(JSON.get -s /comment/user/login jason)"
 			title="$(JSON.get /pull_request/title jason)"
 			url="$(JSON.get -s /comment/url jason)"
-			rpc "msg #myzsh $who commented on pull request $title $url"
+			rpc "msg #myzsh [{purple}$repo{reset}] $who commented on pull request $title {blue}$url"
 		else
 			rpc "msg #myzsh Event of type $event: ${headers[X-GitHub-Delivery]}"
 		fi
