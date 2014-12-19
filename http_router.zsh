@@ -72,7 +72,7 @@ http_router(){
 				echo "Content-type: text/plain" >&$client
 				echo "Connection: close" >&$client
 				echo "" >&$client
-				echo "Reloading modules"
+				echo "Reloading modules" >&$client
 				ztcp -c $client
 				http_reload
 				return
