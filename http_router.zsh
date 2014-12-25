@@ -44,7 +44,7 @@ http_router(){
 		echo "Event type: $event"
 		JSON.load "$body" jason
 		mkdir hooks 2>/dev/null || true
-		echo "$body" > hooks/${headers[X-GitHub-Delivery]}.json
+		#echo "$body" > hooks/${headers[X-GitHub-Delivery]}.json
 
 # [{purple}myzsh-docker{reset}] dan9186 created {purple}change-dev-mapped-dir{reset} (+1 new commit): {blue}https://github.com/myzsh/myzsh-docker/commit/b0614575bde3
 # {purple}myzsh-docker{reset}/{purple}change-dev-mapped-dir{reset} b061457 Daniel Hess: changing to /docker per issue #4
@@ -98,15 +98,16 @@ http_router(){
 			url="$(JSON.get -s /comment/url jason)"
 			rpc "msg #myzsh [{purple}$repo{reset}] $who commented on pull request $title {blue}$url"
 		elif [[ "$event" == "page_build" ]]; then
+			set -x
 			repo="$(JSON.get -s /repository/name jason)"
-			who="$(JSON.get -s /comment/user/login jason)"
-			status="$(JSON.get -s /build/status jason)"
+			buildstatus="$(JSON.get -s /build/status jason)"
 			url="http://$(JSON.get -s /repository/name jason)"
-			if [[ "$status" == "built" ]]; then
+			if [[ "$buildstatus" == "built" ]]; then
 				rpc "msg #myzsh [{purple}$repo{reset}] {blue}$url{reset} rebuilt successfully."
 			else
-				rpc "msg #myzsh [{purple}$repo{reset}] {blue}$url{reset} page_build status $status."
+				rpc "msg #myzsh [{purple}$repo{reset}] {blue}$url{reset} page_build status $buildstatus."
 			fi
+			set +x
 		else
 			rpc "msg #myzsh Event of type $event: ${headers[X-GitHub-Delivery]}"
 		fi
