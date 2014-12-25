@@ -97,6 +97,16 @@ http_router(){
 			title="$(JSON.get /pull_request/title jason)"
 			url="$(JSON.get -s /comment/url jason)"
 			rpc "msg #myzsh [{purple}$repo{reset}] $who commented on pull request $title {blue}$url"
+		elif [[ "$event" == "page_build" ]]; then
+			repo="$(JSON.get -s /repository/name jason)"
+			who="$(JSON.get -s /comment/user/login jason)"
+			status="$(JSON.get -s /build/status jason)"
+			url="http://$(JSON.get -s /repository/name jason)"
+			if [[ "$status" == "built" ]]; then
+				rpc "msg #myzsh [{purple}$repo{reset}] {blue}$url{reset} rebuilt successfully."
+			else
+				rpc "msg #myzsh [{purple}$repo{reset}] {blue}$url{reset} page_build status $status."
+			fi
 		else
 			rpc "msg #myzsh Event of type $event: ${headers[X-GitHub-Delivery]}"
 		fi
