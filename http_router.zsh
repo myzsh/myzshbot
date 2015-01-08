@@ -53,7 +53,7 @@ http_router(){
 		if [[ "$event" == "push" ]]; then
 			whom="$(JSON.get -s /pusher/name jason)"
 			commits="commit"
-			number=$(echo "$jason" | grep -cE "^/commits/[0-9]*/id")
+			number=$(echo "$jason" | grep -cE "^/commits/[0-9]*/id" || true)
 			branch="$(basename "$(JSON.get -s /ref jason)")"
 			repo="$(JSON.get -s /repository/name jason)"
 			force="$(JSON.get /forced jason)"
@@ -62,8 +62,10 @@ http_router(){
 			msg=""
 			if [[ "$number" -gt 1 ]]; then
 				commits="commits"
-			else
-				msg="\"$(JSON.get -s /commits/0/message jason)\" "
+			fi
+			msg="\"$(JSON.get -s /head_commit/message jason)\" "
+			if [[ "$number" == 0 ]]; then
+				number=1
 			fi
 			rpc "msg #myzsh [{purple}$repo{reset}/{purple}$branch{reset}] $whom ${force}pushed $number $commits ${msg}{blue}$url"
 			if [[ "$repo" == "myzshbot" ]] && [[ "$branch" == "master" ]]; then
