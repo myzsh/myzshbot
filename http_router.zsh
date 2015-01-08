@@ -80,12 +80,13 @@ http_router(){
 				return
 			fi
 		elif [[ "$event" == "pull_request" ]]; then
+			repo="$(JSON.get -s /repository/name jason)"
 			who="$(JSON.get -s /pull_request/user/login jason)"
 			title="$(JSON.get /pull_request/title jason)"
 			url="$(JSON.get -s /pull_request/html_url jason)"
-			if [[ "$(JSON.get -s /action)" == "opened" ]]; then
+			if [[ "$(JSON.get -s /action jason)" == "opened" ]]; then
 				rpc "msg #myzsh [{purple}$repo{reset}] $who opened pull request $title {blue}$url"
-			elif [[ "$(JSON.get -s /action)" == "labeled" ]]; then
+			elif [[ "$(JSON.get -s /action jason)" == "labeled" ]]; then
 				label="$(JSON.get /label/name jason)"
 				rpc "msg #myzsh [{purple}$repo{reset}] $who labeled pull request $title as $label {blue}$url"
 			fi
@@ -110,6 +111,8 @@ http_router(){
 				rpc "msg #myzsh [{purple}$repo{reset}] {blue}$url{reset} page_build status $buildstatus."
 			fi
 			set +x
+		elif [[ "$event" == "create" ]]; then
+			echo "ignoring $event"
 		else
 			rpc "msg #myzsh Event of type $event: ${headers[X-GitHub-Delivery]}"
 		fi
