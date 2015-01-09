@@ -104,7 +104,6 @@ http_router(){
 			url="$(JSON.get -s /comment/url jason)"
 			rpc "msg #myzsh [{purple}$repo{reset}] $who commented on pull request $title {blue}$url"
 		elif [[ "$event" == "page_build" ]]; then
-			set -x
 			repo="$(JSON.get -s /repository/name jason)"
 			buildstatus="$(JSON.get -s /build/status jason)"
 			url="http://$(JSON.get -s /repository/name jason)"
@@ -113,9 +112,14 @@ http_router(){
 			else
 				rpc "msg #myzsh [{purple}$repo{reset}] {blue}$url{reset} page_build status $buildstatus."
 			fi
-			set +x
 		elif [[ "$event" == "create" ]]; then
 			echo "ignoring $event"
+		elif [[ "$event" == "delete" ]]; then
+			repo="$(JSON.get -s /repository/name jason)"
+			ref_type="$(JSON.get -s /ref_type jason)"
+			ref="$(JSON.get -s /ref jason)"
+			whom="$(JSON.get -s /sender/login jason)"
+			rpc "msg #myzsh [{purple}$repo{reset}] $whom deleted $ref_type {purple}$ref{reset}."
 		else
 			rpc "msg #myzsh Event of type $event: ${headers[X-GitHub-Delivery]}"
 		fi
