@@ -51,33 +51,36 @@ http_router(){
 # [{purple}myzsh-docker{reset}] dan9186 opened pull request #9: changing to /docker per issue #4 ({purple}master{reset}...{purple}change-dev-mapped-dir{reset}) {blue}https://github.com/myzsh/myzsh-docker/pull/9
 
 		if [[ "$event" == "push" ]]; then
+			deleted="$(JSON.get /deleted jason)"
 			whom="$(JSON.get -s /pusher/name jason)"
-			commits="commit"
-			number=$(echo "$jason" | grep -cE "^/commits/[0-9]*/id" || true)
-			branch="$(basename "$(JSON.get -s /ref jason)")"
 			repo="$(JSON.get -s /repository/name jason)"
-			force="$(JSON.get /forced jason)"
-			[[ "$force" == "false" ]] && force="" || force="forced "
-			url="$(JSON.get -s /compare jason)"
-			msg=""
-			if [[ "$number" -gt 1 ]]; then
-				commits="commits"
-			fi
-			msg="\"$(JSON.get -s /head_commit/message jason || JSON.get /head_commit/message jason | sed -e 's/^"//g')\" "
-			if [[ "$number" == 0 ]]; then
-				number=1
-			fi
-			rpc "msg #myzsh [{purple}$repo{reset}/{purple}$branch{reset}] $whom ${force}pushed $number $commits ${msg}{blue}$url"
-			if [[ "$repo" == "myzshbot" ]] && [[ "$branch" == "master" ]]; then
-				rpc "msg #myzsh reloading modules"
-				echo "HTTP/1.1 200 OK" >&$client
-				echo "Content-type: text/plain" >&$client
-				echo "Connection: close" >&$client
-				echo "" >&$client
-				echo "Reloading modules" >&$client
-				ztcp -c $client
-				http_reload
-				return
+			branch="$(basename "$(JSON.get -s /ref jason)")"
+			if [[ "$deleted" != "true" ]]; then
+				commits="commit"
+				number=$(echo "$jason" | grep -cE "^/commits/[0-9]*/id" || true)
+				force="$(JSON.get /forced jason)"
+				[[ "$force" == "false" ]] && force="" || force="forced "
+				url="$(JSON.get -s /compare jason)"
+				msg=""
+				if [[ "$number" -gt 1 ]]; then
+					commits="commits"
+				fi
+				msg="\"$(JSON.get -s /head_commit/message jason || JSON.get /head_commit/message jason | sed -e 's/^"//g')\" "
+				if [[ "$number" == 0 ]]; then
+					number=1
+				fi
+				rpc "msg #myzsh [{purple}$repo{reset}/{purple}$branch{reset}] $whom ${force}pushed $number $commits ${msg}{blue}$url"
+				if [[ "$repo" == "myzshbot" ]] && [[ "$branch" == "master" ]]; then
+					rpc "msg #myzsh reloading modules"
+					echo "HTTP/1.1 200 OK" >&$client
+					echo "Content-type: text/plain" >&$client
+					echo "Connection: close" >&$client
+					echo "" >&$client
+					echo "Reloading modules" >&$client
+					ztcp -c $client
+					http_reload
+					return
+				fi
 			fi
 		elif [[ "$event" == "pull_request" ]]; then
 			repo="$(JSON.get -s /repository/name jason)"
