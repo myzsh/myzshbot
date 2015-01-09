@@ -63,7 +63,7 @@ http_router(){
 			if [[ "$number" -gt 1 ]]; then
 				commits="commits"
 			fi
-			msg="\"$(JSON.get -s /head_commit/message jason)\" "
+			msg="\"$(JSON.get -s /head_commit/message jason || JSON.get /head_commit/message jason | sed -e 's/^"//g')\" "
 			if [[ "$number" == 0 ]]; then
 				number=1
 			fi
