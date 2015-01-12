@@ -120,6 +120,15 @@ http_router(){
 			ref="$(JSON.get -s /ref jason)"
 			whom="$(JSON.get -s /sender/login jason)"
 			rpc "msg #myzsh [{purple}$repo{reset}] $whom deleted $ref_type {purple}$ref{reset}."
+		elif [[ "$event" == "repository" ]]; then
+			repo="$(JSON.get -s /repository/name jason)"
+			whom="$(JSON.get -s /sender/login jason)"
+			action="$(JSON.get -s /action jason)"
+			if [[ "$action" == "created" ]]; then
+				rpc "msg #myzsh [{purple}$repo{reset}] $whom created repository."
+			else
+				rpc "msg #myzsh [{purple}$repo{reset}] $whom $action repository. TBD"
+			fi
 		else
 			rpc "msg #myzsh Event of type $event: ${headers[X-GitHub-Delivery]}"
 		fi
