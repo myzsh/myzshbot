@@ -8,6 +8,9 @@ channel_msg() {
 	elif [[ $msg = "%reload" ]]; then
 		module_reload
 		msg "#$channel" "Module reload successful"
+	elif [[ $msg = "%dantime" ]]; then
+		dantime="$(TZ=PST8PDT date)"
+		msg "#$channel" "Dan time is currently $dantime"
 	else
 		print "channel_msg: Can't parse $who $channel $msg"
 	fi
