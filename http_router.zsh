@@ -94,7 +94,7 @@ http_router(){
 				rpc "msg #myzsh [{purple}$repo{reset}] $who labeled pull request $title as $label {blue}$url"
 			fi
 		elif [[ "$event" == "issue_comment" ]]; then
-			who="$(JSON.get -s /issue/user/login jason)"
+			who="$(JSON.get -s /comment/user/login jason)"
 			title="$(JSON.get /issue/title jason)"
 			url="$(JSON.get -s /issue/html_url jason)"
 			rpc "msg #myzsh [{purple}$repo{reset}] $who commented on issue $title {blue}$url"
