@@ -130,6 +130,18 @@ http_router(){
 			else
 				rpc "msg #myzsh [{purple}$repo{reset}] $whom $action repository. TBD"
 			fi
+		elif [[ "$event" == "issues" ]]; then
+			repo="$(JSON.get -s /repository/name jason)"
+			action="$(JSON.get -s /action jason)"
+			if [[ "$action" == "opened" ]]; then
+				title="$(JSON.get -s /issue/title jason)"
+				whom="$(JSON.get -s /sender/login jason)"
+				number="$(JSON.get /issue/number jason)"
+				url="$(JSON.get /issue/html_url jason)"
+				rpc "msg #myzsh [{purple}$repo{reset}] $whom $action issue #$number \"$title\" $url"
+			else
+				rpc "msg #myzsh Event of type $event/$action: ${headers[X-GitHub-Delivery]}"
+			fi
 		else
 			rpc "msg #myzsh Event of type $event: ${headers[X-GitHub-Delivery]}"
 		fi
