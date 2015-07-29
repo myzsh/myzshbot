@@ -12,3 +12,9 @@ Testing
 1. Run `http.zsh` in another terminal.
 1. Copy the webhook from the github interface to `test.body`
 1. Run `test.curl` to submit the webhook in `test.body` to `http.zsh`
+
+Deployment
+----------
+The recommended method is to a Docker image with the included `Dockerfile`.
+
+Manual steps are basically running `irc.zsh` and `http.zsh` at the same time. Expose `8080/tcp` via a load balancer.
