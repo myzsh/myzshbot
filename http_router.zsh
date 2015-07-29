@@ -142,6 +142,10 @@ http_router(){
 			else
 				rpc "msg #myzsh Event of type $event/$action: ${headers[X-GitHub-Delivery]}"
 			fi
+		elif [[ "$event" == "watch" ]]; then
+			repo="$(JSON.get -s /repository/name jason)"
+			whom="$(JSON.get -s /sender/login jason)"
+			rpc "msg #myzsh [{purple}$repo{reset}] is now being watched by $whom"
 		else
 			rpc "msg #myzsh Event of type $event: ${headers[X-GitHub-Delivery]}"
 		fi
