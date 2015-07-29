@@ -1,0 +1,7 @@
+#!/bin/bash
+event="${1:-push}"
+if [ -e "test.body" ]; then
+	echo "No test.body file found"
+	exit 1
+fi
+curl -i -d@test.body --header 'X-GitHub-Delivery: 42a97a00-96a9-11e4-80f7-b406135d3f97' --header "X-GitHub-Event: $event" http://localhost:8080/github
