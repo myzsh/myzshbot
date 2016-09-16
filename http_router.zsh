@@ -34,17 +34,17 @@ http_router(){
 			echo "No body!"
 			return
 		fi
-		if [ -z "${headers[X-GitHub-Event]:-}" ]; then
-			echo "No X-GitHub-Event header!"
+		if [ -z "${headers[X-Github-Event]:-}" ]; then
+			echo "No X-Github-Event header!"
 			return
 		fi
-		event="${headers[X-GitHub-Event]}"
+		event="${headers[X-Github-Event]}"
 
 		echo "parsing body"
 		echo "Event type: $event"
 		JSON.load "$body" jason
 		mkdir hooks 2>/dev/null || true
-		#echo "$body" > hooks/${headers[X-GitHub-Delivery]}.json
+		#echo "$body" > hooks/${headers[X-Github-Delivery]}.json
 
 # [{purple}myzsh-docker{reset}] dan9186 created {purple}change-dev-mapped-dir{reset} (+1 new commit): {blue}https://github.com/myzsh/myzsh-docker/commit/b0614575bde3
 # {purple}myzsh-docker{reset}/{purple}change-dev-mapped-dir{reset} b061457 Daniel Hess: changing to /docker per issue #4
@@ -140,14 +140,14 @@ http_router(){
 				url="$(JSON.get /issue/html_url jason)"
 				rpc "msg #myzsh [{purple}$repo{reset}] $whom $action issue #$number \"$title\" $url"
 			else
-				rpc "msg #myzsh Event of type $event/$action: ${headers[X-GitHub-Delivery]}"
+				rpc "msg #myzsh Event of type $event/$action: ${headers[X-Github-Delivery]}"
 			fi
 		elif [[ "$event" == "watch" ]]; then
 			repo="$(JSON.get -s /repository/name jason)"
 			whom="$(JSON.get -s /sender/login jason)"
 			rpc "msg #myzsh [{purple}$repo{reset}] is now being watched by $whom"
 		else
-			rpc "msg #myzsh Event of type $event: ${headers[X-GitHub-Delivery]}"
+			rpc "msg #myzsh Event of type $event: ${headers[X-Github-Delivery]}"
 		fi
 
 	fi
