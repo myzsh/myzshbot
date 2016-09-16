@@ -100,6 +100,7 @@ http_router(){
 			url="$(JSON.get -s /issue/html_url jason)"
 			rpc "msg #myzsh [{purple}$repo{reset}] $who commented on issue $title {blue}$url"
 		elif [[ "$event" == "pull_request_review_comment" ]]; then
+			repo="$(JSON.get -s /repository/name jason)"
 			who="$(JSON.get -s /comment/user/login jason)"
 			title="$(JSON.get /pull_request/title jason)"
 			url="$(JSON.get -s /comment/url jason)"
